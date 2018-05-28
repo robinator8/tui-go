@@ -84,13 +84,19 @@ func (ui *tcellUI) Run() error {
 		return err
 	}
 
+	defer func() {
+		if r := recover(); r != nil {
+			ui.screen.Fini()
+			logger.Printf("Panic: %s", r)
+		}
+	}()
+
 	if w := ui.kbFocus.chain.FocusDefault(); w != nil {
 		w.SetFocused(true)
 		ui.kbFocus.focusedWidget = w
 	}
 
 	ui.screen.SetStyle(tcell.StyleDefault)
-	ui.screen.EnableMouse()
 	ui.screen.Clear()
 
 	go func() {
